@@ -27,6 +27,8 @@
 /* This #ifndef prevents <new> from being included twice and enables the file to be included anywhere */
 #ifndef CPPUTEST_USE_NEW_MACROS
 
+    extern const char* __file__;
+    extern int __line__;
     #if CPPUTEST_USE_STD_CPP_LIB
         #include <new>
         #include <memory>
@@ -35,8 +37,20 @@
 
     void* operator new(size_t size, const char* file, int line) UT_THROW (std::bad_alloc);
     void* operator new[](size_t size, const char* file, int line) UT_THROW (std::bad_alloc);
-    void* operator new(size_t size) UT_THROW(std::bad_alloc);
-    void* operator new[](size_t size) UT_THROW(std::bad_alloc);
+    inline void* operator new(size_t size) UT_THROW(std::bad_alloc)
+    {
+        void *p = operator new(size, __file__, __line__);
+        __file__ = "";
+        __line__ = 0;
+        return p;
+    }
+    inline void* operator new[](size_t size) UT_THROW(std::bad_alloc)
+    {
+	void *p = operator new[](size, __file__, __line__);
+        __file__ = "";
+        __line__ = 0;
+        return p;		
+    }
 
     void operator delete(void* mem) UT_NOTHROW;
     void operator delete[](void* mem) UT_NOTHROW;
@@ -45,7 +59,7 @@
 
 #endif
 
-#define new new(__FILE__, __LINE__)
+#define new (__file__ =__FILE__,__line__= __LINE__) && 0 ? nullptr : new
 
 #define CPPUTEST_USE_NEW_MACROS 1
 

@@ -32,6 +32,9 @@
 #include "CppUTest/PlatformSpecificFunctions.h"
 #include "CppUTest/SimpleMutex.h"
 
+const char* __file__ = "";
+int __line__ = 0;
+
 /********** Enabling and disabling for C also *********/
 
 #if CPPUTEST_USE_MEM_LEAK_DETECTION
@@ -299,10 +302,12 @@ static void *(*operator_new_array_debug_fptr)(size_t size, const char* file, int
 static void (*operator_delete_fptr)(void* mem) UT_NOTHROW = mem_leak_operator_delete;
 static void (*operator_delete_array_fptr)(void* mem) UT_NOTHROW = mem_leak_operator_delete_array;
 
+/*
 void* operator new(size_t size) UT_THROW(std::bad_alloc)
 {
     return operator_new_fptr(size);
 }
+*/
 
 void* operator new(size_t size, const char* file, int line) UT_THROW(std::bad_alloc)
 {
@@ -319,10 +324,12 @@ void operator delete(void* mem, const char*, int) UT_NOTHROW
     operator_delete_fptr(mem);
 }
 
+/*
 void* operator new[](size_t size) UT_THROW(std::bad_alloc)
 {
     return operator_new_array_fptr(size);
 }
+*/
 
 void* operator new [](size_t size, const char* file, int line) UT_THROW(std::bad_alloc)
 {
